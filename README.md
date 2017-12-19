@@ -76,7 +76,7 @@
 	 -e slave_sg=jenkins-slave-sg \
 	 -e slave_ami=ami-54e1da34 \
 	 -e slave_tag=JenkinsDynamicSlaves-EFS-12-DEC \
-	 -e slave_iam=arn:aws:iam::953030164212:instance-profile/jenkins_slave_profile-support \
+	 -e slave_iam=arn:aws:iam::9595136724:instance-profile/jenkins_slave_profile-support \
 	 -e master_hostname=tag_Name_Jenkins_Master
     
     

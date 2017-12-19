@@ -50,7 +50,7 @@ jenkins_elb_timeout             = 10
 jenkins_elb_elb_health_target   = "TCP:8080"
 jenkins_elb_interval            = "15"
 // Certificate must be available in IAM or ACM and must match region being deployed in
-jenkins_ssl_certificate_id      = "arn:aws:acm:us-west-1:953030164212:certificate/ce79dc73-ceb3-4eb2-8fcf-0976e7058a37"
+jenkins_ssl_certificate_id      = "arn:aws:acm:us-west-1:9595136724:certificate/ce79dc73-ceb3-4eb2-8fcf-0976e7058a37"
 
 // Jenkins saurcelab Slave
 jenkins_saurcelab_instance_type	= "t2.medium"

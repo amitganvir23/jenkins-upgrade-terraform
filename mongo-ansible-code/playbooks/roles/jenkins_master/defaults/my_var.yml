@@ -38,7 +38,7 @@ config_xml: "/var/lib/jenkins/config.xml"
 slave_ami: ami-54e1da34
 slave_subnet: subnet-f9518ca2
 slave_sg: jenkins-slave-sg
-slave_iam: "arn:aws:iam::953030164212:instance-profile/jenkins_slave_profile-support"
+slave_iam: "arn:aws:iam::9595136724:instance-profile/jenkins_slave_profile-support"
 slave_tag: JenkinsDynamicSlaves-EFS-12-DEC
 
 ## Jenkins main configuraton file and changes update here
