@@ -15,15 +15,15 @@
 
 # How to perform terraform
 ## Note
-  - Terraform code also include Ansilbe playbook to deploye Jenkins Master with updated changes if required. here is the yaml file "mongo-infra-supporting-aws-stack/mongo-ansible-code/playbooks/jenkins-master.yml"
-  - To skip Jenkins Master Upgrade ansible playbook then comment all section for moduel "jenkins-ansible-master-changes" in file "mongo-infra-supporting-aws-stack/mongo-supporting-infra-terraform/stack-deployment/main.tf"
-  - Terraform Module Path for Ansible to deploy Jenkins Master: "mongo-infra-supporting-aws-stack/mongo-supporting-infra-terraform/modules/jenkins-master-ansible"
+  - Terraform code also include Ansilbe playbook to deploye Jenkins Master with updated changes if required. here is the yaml file "jenkins-upgrade-terraform/mongo-ansible-code/playbooks/jenkins-master.yml"
+  - To skip Jenkins Master Upgrade ansible playbook then comment all section for moduel "jenkins-ansible-master-changes" in file "jenkins-upgrade-terraform/mongo-supporting-infra-terraform/stack-deployment/main.tf"
+  - Terraform Module Path for Ansible to deploy Jenkins Master: "jenkins-upgrade-terraform/mongo-supporting-infra-terraform/modules/jenkins-master-ansible"
   
   
   
 
   # Deploy Terraform to build Jenkins Infrastructer without Upgrade Jenkins Master - Check above Note before perform this steps
-  	- # cd mongo-infra-supporting-aws-stack/mongo-supporting-infra-terraform/stack-deployment
+  	- # cd jenkins-upgrade-terraform/mongo-supporting-infra-terraform/stack-deployment
   	- # terraform plan
   	- # terraform apply
   
@@ -35,7 +35,7 @@
   # Deploye Terraform to build Jenkins Infrastructer including Upgrade Jenkins Master
 
   # 1) Check and set below values in terraform var file before deploy
-    File Path: "mongo-infra-supporting-aws-stack/mongo-supporting-infra-terraform/stack-deployment/terraform.tfvars"
+    File Path: "jenkins-upgrade-terraform/mongo-supporting-infra-terraform/stack-deployment/terraform.tfvars"
      //jenkins Master
       aws_key_name = "terraform-support-keys"
       jenkins-master-ami = "ami-66d9dc06"
@@ -45,7 +45,7 @@
       slave_tag = "JenkinsDynamicSlaves-EFS-12-DEC"
     
   # 2) Check and set below values in Ansible var file before deploy
-    File Path: "mongo-infra-supporting-aws-stack/mongo-ansible-code/playbooks/roles/jenkins_master/defaults/my_var.yml"
+    File Path: "jenkins-upgrade-terraform/mongo-ansible-code/playbooks/roles/jenkins_master/defaults/my_var.yml"
     // Update Jenkins Version if you want upgrade Jenkins
       jenkins_version: "2.73.3"
       jenkins_plug_url: "https://updates.jenkins-ci.org/stable-2.73/latest"
@@ -62,14 +62,14 @@
 
    # 4) Once you Done the changes on Ansible and terraform var then run below command to deploy Jenkins infra
 
-	- # cd mongo-infra-supporting-aws-stack/mongo-supporting-infra-terraform/stack-deployment
+	- # cd jenkins-upgrade-terraform/mongo-supporting-infra-terraform/stack-deployment
     - # terraform plan
     - # terraform apply
     
  ========================================================================================================   
     
  # Deploy Only Ansilbe playbook manually on Running Jenkins Master Instance - Also update values in varible
-     - # ansible-playbook mongo-infra-supporting-aws-stack/mongo-ansible-code/playbooks/jenkins-master.yml \
+     - # ansible-playbook jenkins-upgrade-terraform/mongo-ansible-code/playbooks/jenkins-master.yml \
 	 --private-key=/root/terra-private-key \
 	 -i ../../mongo-ansible-code/hosts/ec2.py \
 	 -e slave_subnet=subnet-f9518ca2 \
@@ -83,10 +83,10 @@
 ========================================================================================================
     
 # Creating Jenkins Master AMI using Packer
-  #Before create AMI please check your Jenkins Master playbook in this dir location 'mongo-infra-supporting-aws-stack/mongo-ansible-code/playbooks/' and update it if needed
+  #Before create AMI please check your Jenkins Master playbook in this dir location 'jenkins-upgrade-terraform/mongo-ansible-code/playbooks/' and update it if needed
   #No need to define values for dynamic slave so skip this part because any how terraform will apply dynamic values while deploying.
   
-   	- # cd mongo-infra-supporting-aws-stack/mongo-jenkins-packer-ami
+   	- # cd jenkins-upgrade-terraform/mongo-jenkins-packer-ami
    	- # packer build jenkins-master.json
 ========================================================================================================
 # IMP Note: After deployment
