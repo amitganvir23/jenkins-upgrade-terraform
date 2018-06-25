@@ -1,0 +1,92 @@
+---
+- hosts: localhost
+  gather_facts: yes
+  vars:
+     - REGION: us-east-2
+     ## Orign Jenkins
+     #- instance_id: i-0889b2860bedc0029
+     #- volume_id: vol-0a574e36005e5b941
+     #- device_name: /dev/sdg
+
+     #test
+     - instance_ID: i-080e5189497b26ecf
+     - volume_ID: vol-0276b3ffe27b0c250
+     - device_NAME: /dev/sdb
+     
+     - DATE: "{{ ansible_date_time.date }}"
+     - Snap_Description: "Snapshot of Jenkins Master taken {{ ansible_date_time.date }}"
+     - Min_AGE: 1440
+     - Snap_Tag_Value: "{{DATE}}"
+     - Tag_Value_Check: "SNAPSHOT"
+     - Max_Snapshot: 4
+
+  tasks:
+
+  - name: Checking all Jenkins Master snapshot details
+    ec2_snapshot_facts:
+      region: "{{REGION}}"
+      filters: 
+         "tag:JENKINS_MASTER": '{{ Tag_Value_Check }}'
+    register: all_snap_result
+
+  - name: Checking current todays Jenkins Master snapshot details
+    ec2_snapshot_facts:
+      region: "{{REGION}}"
+      filters: 
+         "tag:DATE": '{{ Snap_Tag_Value }}'
+    register: snap_result
+   
+  - name: Collecting all snapshots ids
+    shell: "echo '{{all_snap_result}}' | tr -d 'u' | tr ',' '\n' | grep -w snapshot_id | tr -d \"'\" | sed 's/ //g' | cut -d ':' -f 2|sed -n \"$(({{Max_Snapshot}}+1)),50p\""
+    register: snap_id
+
+  - name: Counting number of all snapshots ids
+    shell: "echo '{{all_snap_result}}' | tr -d 'u' | tr ',' '\n' | grep -cw snapshot_id"
+    register: snap_num
+
+  - name: Counting the todays snapshots
+    shell: "echo '{{snap_result}}' | tr -d 'u' | tr ',' '\n' | grep -w snapshot_id | tr -d \"'\" | sed 's/ //g' | cut -d ':' -f 2|wc -l"
+    register: snap_id_count
+
+
+  - debug: msg="=========================== [ {{snap_num.stdout}} Snapshot already created including todays ] ==========================="
+#    when: snap_id_count.stdout != "0"
+
+  - debug: msg="{{snap_id.stdout}}"
+
+  - name: Creating Snapshot for Jenkins_Master
+    ec2_snapshot:
+      region: "{{REGION}}"
+#      instance_id: "{{instance_ID}}"
+#      device_name: "{{device_NAME}}"
+      volume_id: "{{volume_ID}}"
+      description: "{{Snap_Description}}"
+      wait: yes      
+      snapshot_tags:
+        Name: "Jenkins_Master_Test_Snapshot_{{DATE}}"
+        DATE: "{{ DATE }}"
+        JENKINS_MASTER: SNAPSHOT
+    when: snap_id_count.stdout == "0"
+    register: snap_create_result
+
+  - debug: msg="{{snap_create_result}}"
+    when: snap_id_count.stdout == "0"
+
+#  - name: Deleting Snapshot for Jenkins_Master
+#    shell: "echo my snapshot: {{item}}"
+#    with_items:
+#        - "{{snap_id.stdout_lines}}"
+#    when: snap_id_count.stdout > "{{Max_Snapshot}}"
+
+  - name: Deleting Snapshot for Jenkins_Master
+    ec2_snapshot:
+      region: "{{REGION}}"
+      state: absent
+      snapshot_id: "{{item}}"
+    with_items:
+        - "{{snap_id.stdout_lines}}"
+    when: snap_num.stdout > "{{Max_Snapshot}}"
+    register: snap_delete_result
+
+  - debug: msg="{{snap_delete_result}}"
+    when: snap_num.stdout > "{{Max_Snapshot}}"
